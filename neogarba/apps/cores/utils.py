@@ -27,3 +27,13 @@ PREFIXES = {
     'livraison': 'LIV',
     'codeotp':'OTP'
 }
+
+
+
+
+
+
+
+
+
+
