@@ -30,6 +30,56 @@ class CategorieMenu(models.Model):
         verbose_name = "Categorie"
         verbose_name_plural = "Categories"
 
+
+class Plat(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=generer_uuid7,
+        editable=False,
+    )
+
+    reference = models.CharField(
+        max_length=30,
+        unique=True,
+        editable=False
+    )
+
+    nom = models.CharField(max_length=255)
+    prix = models.PositiveIntegerField()
+    description = models.TextField(
+        blank=True, default=''
+    )
+
+    image = models.ImageField(upload_to="plats/",
+                              null=True, blank=True)
+
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            self.reference = generer_reference(PREFIXES['plat'])
+        super().save(*args, **kwargs)
+
+    disponibilite = models.CharField(
+        max_length=20,
+        choices=DisponibiliteEnum.choices,
+        default=DisponibiliteEnum.DISPONIBLE
+    )
+
+    quantite_stock = models.PositiveIntegerField(default=0)
+
+    categorie = models.ForeignKey(
+        CategorieMenu,
+        on_delete=models.PROTECT,
+        related_name='plats',
+    )
+
+    class Meta:
+        verbose_name = "Plat"
+        verbose_name_plural = "Plats"
+
+
+
+
 class OptionPersonnalisation(models.Model):
     id = models.UUIDField(
         primary_key=True,
@@ -55,7 +105,11 @@ class OptionPersonnalisation(models.Model):
         default=True
     )
 
-    plat = None
+    plat = models.ForeignKey(
+        Plat,
+        on_delete=models.CASCADE,
+        related_name='options',
+    )
 
     def save(self, *args, **kwargs):
         if not self.reference:
