@@ -17,7 +17,7 @@ class Utilisateur(AbstractUser):
         max_length=30,
         unique=True,
         editable=False,
-        help_text="Reference metier (ex: USR-20260420-A1B2C3D4E5)"
+        help_text="Reference metier"
     )
 
     telephone = models.CharField(
@@ -93,15 +93,6 @@ class Administrateur(Utilisateur):
     def save(self, *args, **kwargs):
         self.role = RoleEnum.ADMINISTRATEUR
         super().save(*args, **kwargs)
-
-
-# AdresseLivraison
-# (idAddrLiv, libelle,
-# adresseComplete,
-# quartier,
-# estParDefaut,
-# #idClient => Client.idClient)
-
 
 
 class AdresseLivraison(models.Model):
