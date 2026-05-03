@@ -169,16 +169,3 @@ class CodeOTP(models.Model):
     class Meta:
         verbose_name = "Code OTP"
         verbose_name_plural = "Codes OTP"
-
-
-
-
-
-
-
-
-
-
-
-
-

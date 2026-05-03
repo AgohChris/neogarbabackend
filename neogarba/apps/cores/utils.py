@@ -1,7 +1,8 @@
 import uuid
 from uuid_utils import uuid7 as _uuid7
 from datetime import datetime
-
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 def generer_uuid7():
     return uuid.UUID(str(_uuid7()))
@@ -29,11 +30,21 @@ PREFIXES = {
 }
 
 
+def envoyer_email(sujet, template_name, contexte, destinataire):
 
+    contenue_html = render_to_string(template_name, contexte)
 
+    contenu_texte = f"neogarba : {sujet}"
 
+    message = EmailMultiAlternatives(
+        subject=contenu_texte,
+        body=contenue_html,
+        to=[destinataire]
+    )
 
+    message.attach_alternative(contenue_html, "text/html")
 
+    message.send()
 
 
 
