@@ -84,3 +84,30 @@ class VerificationOTPSerializer(serializers.Serializer):
 
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Utilisateur
+        fields = [
+            'id', 'reference', 'username', 'first_name', 'last_name',
+            'telephone', 'email', 'role', 'date_joined', 'is_active'
+        ]
+        read_only_fields = ['date_joined', 'is_active', 'id', 'username', 'role', 'reference']
+
+    def validate_email(self, value):
+            if Utilisateur.objects.filter(email=value).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError("Cet Email est déjà utilisé.")
+            return value.lower()
+
+    def validate_telephone(self, value):
+            if Utilisateur.objects.filter(telephone=value).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError("Cet numéro de téléphone est déjà utilisé.")
+            return value
+
+
+
+
+
+
+
+
+

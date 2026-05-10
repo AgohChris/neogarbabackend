@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue sur NeoGarba</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            margin:0;
+            padding:0;
+            background:#f4f4f4;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container{
+            width:100%;
+            padding:40px 20px;
+            box-sizing:border-box;
+        }
+
+        .email-card{
+            max-width:600px;
+            margin:auto;
+            background:#ffffff;
+            border-radius:18px;
+            overflow:hidden;
+            box-shadow:0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .header{
+            background:linear-gradient(135deg, #111827, #1f2937);
+            padding:40px 30px;
+            text-align:center;
+        }
+
+        .logo{
+            font-size:32px;
+            font-weight:bold;
+            color:#ffffff;
+            letter-spacing:1px;
+        }
+
+        .content{
+            padding:40px 30px;
+            color:#374151;
+        }
+
+        .title{
+            font-size:28px;
+            font-weight:bold;
+            margin-bottom:20px;
+            color:#111827;
+        }
+
+        .text{
+            font-size:16px;
+            line-height:1.8;
+            margin-bottom:20px;
+        }
+
+        .info-box{
+            background:#f9fafb;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            padding:20px;
+            margin:30px 0;
+        }
+
+        .info-item{
+            margin-bottom:12px;
+            font-size:15px;
+        }
+
+        .label{
+            font-weight:bold;
+            color:#111827;
+        }
+
+        .button{
+            display:inline-block;
+            padding:14px 28px;
+            background:#111827;
+            color:#ffffff !important;
+            text-decoration:none;
+            border-radius:10px;
+            font-weight:bold;
+            margin-top:10px;
+        }
+
+        .footer{
+            background:#f9fafb;
+            padding:25px;
+            text-align:center;
+            font-size:13px;
+            color:#6b7280;
+        }
+
+        @media only screen and (max-width: 600px){
+
+            .title{
+                font-size:24px;
+            }
+
+            .content{
+                padding:30px 20px;
+            }
+
+            .header{
+                padding:30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="email-card">
+
+            <div class="header">
+                <div class="logo">
+                    NeoGarba
+                </div>
+            </div>
+
+            <div class="content">
+
+                <div class="title">
+                    Bienvenue {{ prenom }} 👋
+                </div>
+
+                <div class="text">
+                    Nous sommes ravis de vous accueillir sur <strong>NeoGarba</strong>.
+                    Votre compte a été créé avec succès et vous faites désormais partie de notre communauté.
+                </div>
+
+                <div class="info-box">
+
+                    <div class="info-item">
+                        <span class="label">Prénom :</span>
+                        {{ prenom }}
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">Nom :</span>
+                        {{ nom }}
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">Email :</span>
+                        {{ email }}
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">Date d'inscription :</span>
+                        {{ date_inscription }}
+                    </div>
+
+                </div>
+
+                <div class="text">
+                    Vous pouvez maintenant accéder à votre espace et profiter pleinement de nos services.
+                </div>
+
+                <a href="https://neogarba.com" class="button">
+                    Accéder à NeoGarba
+                </a>
+
+            </div>
+
+            <div class="footer">
+                © {{ date_inscription|date:"Y" }} NeoGarba — Tous droits réservés.
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

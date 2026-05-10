@@ -1,10 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Code de vérification NeoGarba</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+
+        body{
+            margin:0;
+            padding:0;
+            background:#f3f4f6;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        .wrapper{
+            width:100%;
+            padding:40px 20px;
+            box-sizing:border-box;
+        }
+
+        .card{
+            max-width:600px;
+            margin:auto;
+            background:#ffffff;
+            border-radius:20px;
+            overflow:hidden;
+            box-shadow:0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        .header{
+            background:linear-gradient(135deg,#111827,#1f2937);
+            padding:40px 30px;
+            text-align:center;
+        }
+
+        .logo{
+            color:#ffffff;
+            font-size:34px;
+            font-weight:bold;
+            letter-spacing:1px;
+        }
+
+        .content{
+            padding:45px 35px;
+            text-align:center;
+        }
+
+        .title{
+            font-size:30px;
+            font-weight:bold;
+            color:#111827;
+            margin-bottom:20px;
+        }
+
+        .text{
+            font-size:16px;
+            line-height:1.8;
+            color:#4b5563;
+            margin-bottom:25px;
+        }
+
+        .otp-box{
+            display:inline-block;
+            background:#111827;
+            color:#ffffff;
+            padding:18px 35px;
+            border-radius:14px;
+            font-size:36px;
+            font-weight:bold;
+            letter-spacing:10px;
+            margin:25px 0;
+        }
+
+        .warning{
+            background:#fff7ed;
+            border:1px solid #fdba74;
+            color:#9a3412;
+            padding:18px;
+            border-radius:12px;
+            font-size:14px;
+            line-height:1.6;
+            margin-top:30px;
+            text-align:left;
+        }
+
+        .footer{
+            background:#f9fafb;
+            padding:25px;
+            text-align:center;
+            color:#6b7280;
+            font-size:13px;
+        }
+
+        @media only screen and (max-width:600px){
+
+            .content{
+                padding:35px 20px;
+            }
+
+            .title{
+                font-size:24px;
+            }
+
+            .otp-box{
+                font-size:28px;
+                letter-spacing:6px;
+                padding:16px 24px;
+            }
+        }
+
+    </style>
 </head>
+
 <body>
+
+    <div class="wrapper">
+
+        <div class="card">
+
+            <div class="header">
+                <div class="logo">
+                    NeoGarba
+                </div>
+            </div>
+
+            <div class="content">
+
+                <div class="title">
+                    Vérification de votre compte
+                </div>
+
+                <div class="text">
+                    Bonjour <strong>{{ prenom }}</strong>,<br><br>
+
+                    Utilisez le code ci-dessous pour confirmer votre identité
+                    et finaliser votre opération sur NeoGarba.
+                </div>
+
+                <div class="otp-box">
+                    {{ code }}
+                </div>
+
+                <div class="text">
+                    Ce code est valable pendant
+                    <strong>{{ durée_validate }} minutes</strong>.
+                </div>
+
+                <div class="warning">
+                    Si vous n’êtes pas à l’origine de cette demande,
+                    ignorez simplement cet email.
+                    Ne partagez jamais votre code OTP avec qui que ce soit.
+                </div>
+
+            </div>
+
+            <div class="footer">
+                © {% now "Y" %} NeoGarba — Sécurité & Vérification.
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
 </html>

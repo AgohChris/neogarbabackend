@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.core.mail import send_mail
+from django.db.migrations import serializer
 from django.shortcuts import render
 
 from django.utils import timezone
@@ -9,6 +10,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.cores.utils import envoyer_email
 from django.template.loader import render_to_string
@@ -16,6 +18,8 @@ from .models import Utilisateur, CodeOTP
 from .serializers import *
 import secrets
 import string
+
+from ..commandes.models import Panier
 
 
 # Create your views here.
@@ -57,6 +61,13 @@ def EnvoieCodeOTP(utilsateur, template_email='emails/code-otp-inscription.html')
     return code
 
 
+def generer_tokens_jwt(utilisateur):
+
+    refresh = RefreshToken.for_user(utilisateur)
+    return {
+        'access': str(refresh.access_token),
+        'refresh': str(refresh)
+    }
 
 class InscriptionView(APIView):
 
@@ -75,8 +86,7 @@ class InscriptionView(APIView):
 
         EnvoieCodeOTP(
             utilsateur=client,
-            template_email='emails/code-otp-inscription.html',
-            sujet='Votre code de vérification neogarba'
+            template_email='emails/code-otp-inscription.html'
         )
 
         return Response({
@@ -84,3 +94,74 @@ class InscriptionView(APIView):
             'email': client.email,
         }, status=status.HTTP_201_CREATED
         )
+
+
+from django.utils import timezone
+
+class VerificationOTPView(APIView):
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+
+        serializer = VerificationOTPSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response({
+                'erreurs': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        utilisateur = serializer.validated_data['utilisateur']
+        code_otp = serializer.validated_data['code']
+
+        otp = CodeOTP.objects.get(
+            utilisateur=utilisateur,
+            code=code_otp
+        )
+
+        # Activation du compte
+        utilisateur.is_active = True
+        utilisateur.save()
+
+        # Marquer OTP comme utilisé
+        otp.est_utilise = True
+        otp.save()
+
+        # Création panier
+        Panier.objects.create(
+            client=utilisateur.client
+        )
+
+        envoyer_email(
+            sujet="Bienvenue sur neogarba",
+            template_name="emails/welcome.html",
+            contexte={
+                'prenom': utilisateur.first_name,
+                'nom': utilisateur.last_name,
+                'email': utilisateur.email,
+                'date_inscription': utilisateur.date_joined.strftime('%d/%m/%Y'),
+            },
+            destinataire=utilisateur.email
+        )
+
+        tokens = generer_tokens_jwt(utilisateur)
+
+        return Response({
+            'message': 'Compte vérifié et activé avec succès',
+            'tokens': tokens,
+            'utilisateur': ProfileSerializer(utilisateur).data,
+        }, status=status.HTTP_200_OK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
