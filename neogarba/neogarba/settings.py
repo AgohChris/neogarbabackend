@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.livraisons',
     'apps.paiements',
     'apps.utilisateurs',
+    'apps.tableau_de_bord', 
 ]
 
 
