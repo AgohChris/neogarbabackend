@@ -1,4 +1,6 @@
 # utilisateurs/tests/test_auth.py
+import os
+
 from django.urls import reverse
 from django.utils import timezone
 
@@ -7,8 +9,14 @@ from rest_framework import status
 
 from utilisateurs.models import Utilisateur, CodeOTP
 
+TEST_EMAIL = os.getenv('TEST_USER_EMAIL', 'test@neopy.com')
+TEST_PASSWORD = os.getenv('TEST_USER_PASSWORD', 'TestPass123!')
+TEST_NEW_PASSWORD = os.getenv('TEST_USER_NEW_PASSWORD', 'NouveauMdp456!')
+TEST_OTP_CODE = os.getenv('TEST_OTP_CODE', '123456')
+TEST_OTP_CODE_EXPIRED = os.getenv('TEST_OTP_CODE_EXPIRED', '654321')
 
-def creer_utilisateur(email='test@neopy.com', password='TestPass123!', **kwargs):
+
+def creer_utilisateur(email=TEST_EMAIL, password=TEST_PASSWORD, **kwargs):
     user = Utilisateur.objects.create_user(
         email=email,
         password=password,
@@ -26,21 +34,21 @@ class ConnexionTests(APITestCase):
         self.user = creer_utilisateur()
 
     def test_connexion_reussie(self):
-        data = {'email': 'test@neopy.com', 'password': 'TestPass123!'}
+        data = {'email': TEST_EMAIL, 'password': TEST_PASSWORD}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('tokens', response.data)
         self.assertIn('access', response.data['tokens'])
 
     def test_connexion_mot_de_passe_incorrect(self):
-        data = {'email': 'test@neopy.com', 'password': 'MauvaisMdp!'}
+        data = {'email': TEST_EMAIL, 'password': 'MauvaisMdp!'}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_connexion_compte_inactif(self):
         self.user.is_active = False
         self.user.save()
-        data = {'email': 'test@neopy.com', 'password': 'TestPass123!'}
+        data = {'email': TEST_EMAIL, 'password': TEST_PASSWORD}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -95,9 +103,9 @@ class ChangerMotDePasseTests(APITestCase):
 
     def test_changer_mot_de_passe_reussi(self):
         data = {
-            'ancien_mot_de_passe': 'TestPass123!',
-            'nouveau_mot_de_passe': 'NouveauMdp456!',
-            'confirmer_mot_de_passe': 'NouveauMdp456!',
+            'ancien_mot_de_passe': TEST_PASSWORD,
+            'nouveau_mot_de_passe': TEST_NEW_PASSWORD,
+            'confirmer_mot_de_passe': TEST_NEW_PASSWORD,
         }
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -105,8 +113,8 @@ class ChangerMotDePasseTests(APITestCase):
     def test_ancien_mot_de_passe_incorrect(self):
         data = {
             'ancien_mot_de_passe': 'MauvaisMdp!',
-            'nouveau_mot_de_passe': 'NouveauMdp456!',
-            'confirmer_mot_de_passe': 'NouveauMdp456!',
+            'nouveau_mot_de_passe': TEST_NEW_PASSWORD,
+            'confirmer_mot_de_passe': TEST_NEW_PASSWORD,
         }
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -132,9 +140,9 @@ class ReinitialiserMotDePasseTests(APITestCase):
         )
         data = {
             'email': self.user.email,
-            'code_otp': '123456',
-            'nouveau_mot_de_passe': 'NouveauMdp456!',
-            'confirmer_mot_de_passe': 'NouveauMdp456!',
+            'code_otp': TEST_OTP_CODE,
+            'nouveau_mot_de_passe': TEST_NEW_PASSWORD,
+            'confirmer_mot_de_passe': TEST_NEW_PASSWORD,
         }
         response = self.client.post(self.url_reinit, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -148,9 +156,9 @@ class ReinitialiserMotDePasseTests(APITestCase):
         )
         data = {
             'email': self.user.email,
-            'code_otp': '654321',
-            'nouveau_mot_de_passe': 'NouveauMdp456!',
-            'confirmer_mot_de_passe': 'NouveauMdp456!',
+            'code_otp': TEST_OTP_CODE_EXPIRED,
+            'nouveau_mot_de_passe': TEST_NEW_PASSWORD,
+            'confirmer_mot_de_passe': TEST_NEW_PASSWORD,
         }
         response = self.client.post(self.url_reinit, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
