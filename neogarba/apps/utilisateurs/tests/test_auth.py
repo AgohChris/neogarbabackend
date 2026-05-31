@@ -9,11 +9,12 @@ from rest_framework import status
 
 from utilisateurs.models import Utilisateur, CodeOTP
 
-TEST_EMAIL = os.getenv('TEST_USER_EMAIL', 'test@neopy.com')
-TEST_PASSWORD = os.getenv('TEST_USER_PASSWORD', 'TestPass123!')
-TEST_NEW_PASSWORD = os.getenv('TEST_USER_NEW_PASSWORD', 'NouveauMdp456!')
-TEST_OTP_CODE = os.getenv('TEST_OTP_CODE', '123456')
-TEST_OTP_CODE_EXPIRED = os.getenv('TEST_OTP_CODE_EXPIRED', '654321')
+TEST_EMAIL = os.environ['TEST_USER_EMAIL']
+TEST_PASSWORD = os.environ['TEST_USER_PASSWORD']
+TEST_NEW_PASSWORD = os.environ['TEST_USER_NEW_PASSWORD']
+TEST_OTP_CODE = os.environ['TEST_OTP_CODE']
+TEST_OTP_CODE_EXPIRED = os.environ['TEST_OTP_CODE_EXPIRED']
+TEST_WRONG_PASSWORD = os.environ['TEST_WRONG_PASSWORD']
 
 
 def creer_utilisateur(email=TEST_EMAIL, password=TEST_PASSWORD, **kwargs):
@@ -41,7 +42,7 @@ class ConnexionTests(APITestCase):
         self.assertIn('access', response.data['tokens'])
 
     def test_connexion_mot_de_passe_incorrect(self):
-        data = {'email': TEST_EMAIL, 'password': 'MauvaisMdp!'}
+        data = {'email': TEST_EMAIL, 'password': TEST_WRONG_PASSWORD}
         response = self.client.post(self.url, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -112,7 +113,7 @@ class ChangerMotDePasseTests(APITestCase):
 
     def test_ancien_mot_de_passe_incorrect(self):
         data = {
-            'ancien_mot_de_passe': 'MauvaisMdp!',
+            'ancien_mot_de_passe': TEST_WRONG_PASSWORD,
             'nouveau_mot_de_passe': TEST_NEW_PASSWORD,
             'confirmer_mot_de_passe': TEST_NEW_PASSWORD,
         }
@@ -134,7 +135,7 @@ class ReinitialiserMotDePasseTests(APITestCase):
     def test_reinitialisation_complete(self):
         code = CodeOTP.objects.create(
             utilisateur=self.user,
-            code='123456',
+            code=TEST_OTP_CODE,
             usage='reinitialisation',
             expire_a=timezone.now() + timezone.timedelta(minutes=15),
         )
@@ -150,7 +151,7 @@ class ReinitialiserMotDePasseTests(APITestCase):
     def test_reinitialisation_code_expire(self):
         code = CodeOTP.objects.create(
             utilisateur=self.user,
-            code='654321',
+            code=TEST_OTP_CODE_EXPIRED,
             usage='reinitialisation',
             expire_a=timezone.now() - timezone.timedelta(minutes=1),
         )
