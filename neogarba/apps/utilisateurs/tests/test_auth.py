@@ -9,20 +9,22 @@ from rest_framework import status
 
 from utilisateurs.models import Utilisateur, CodeOTP
 
-TEST_EMAIL = os.environ['TEST_USER_EMAIL']
-TEST_PASSWORD = os.environ['TEST_USER_PASSWORD']
-TEST_NEW_PASSWORD = os.environ['TEST_USER_NEW_PASSWORD']
-TEST_OTP_CODE = os.environ['TEST_OTP_CODE']
-TEST_OTP_CODE_EXPIRED = os.environ['TEST_OTP_CODE_EXPIRED']
-TEST_WRONG_PASSWORD = os.environ['TEST_WRONG_PASSWORD']
+TEST_EMAIL = os.getenv('TEST_USER_EMAIL')
+TEST_PASSWORD = os.getenv('TEST_USER_PASSWORD')
+TEST_NEW_PASSWORD = os.getenv('TEST_USER_NEW_PASSWORD')
+TEST_OTP_CODE = os.getenv('TEST_OTP_CODE')
+TEST_OTP_CODE_EXPIRED = os.getenv('TEST_OTP_CODE_EXPIRED')
+TEST_WRONG_PASSWORD = os.getenv('TEST_WRONG_PASSWORD')
+TEST_FIRST_NAME = os.environ.get('TEST_FIRST_NAME')
+TEST_LAST_NAME = os.environ.get('TEST_LAST_NAME')
 
 
 def creer_utilisateur(email=TEST_EMAIL, password=TEST_PASSWORD, **kwargs):
     user = Utilisateur.objects.create_user(
         email=email,
         password=password,
-        first_name='Jean',
-        last_name='Dupont',
+        first_name=TEST_FIRST_NAME,
+        last_name=TEST_LAST_NAME,
         **kwargs
     )
     return user
