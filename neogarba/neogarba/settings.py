@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.livraisons',
     'apps.paiements',
     'apps.utilisateurs',
+    'apps.tableau_de_bord', 
 ]
 
 
@@ -88,11 +89,11 @@ AUTH_USER_MODEL = 'utilisateurs.Utilisateur'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE') ,
-        'USER': os.getenv('USERNAME'),
-        'PASSWORD': os.getenv('PASSWORD'),
-        'HOST': os.getenv('HOST'),
-        'PORT': os.getenv('PORT'),
+        'NAME': os.getenv('DATABASE'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
