@@ -5,17 +5,18 @@ from django.conf.global_settings import MEDIA_ROOT
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env', override=True)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8i32&=r68#i3s7k(i5w&mmt0iy#v9s(8@2y$ff9nnd@6n&44-v'
+# Load the secret key from environment to avoid committing it to the repo.
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'apps.livraisons',
     'apps.paiements',
     'apps.utilisateurs',
+    'apps.tableau_de_bord', 
 ]
 
 
