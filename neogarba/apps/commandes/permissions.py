@@ -3,10 +3,7 @@ from apps.cores.enums import RoleEnum
 
 
 class HasRole(BasePermission):
-    """
-    Permission générique basée sur le rôle.
-    Usage : HasRole.for_role(RoleEnum.SERVEUR)
-    """
+  
     required_role = None
 
     def has_permission(self, request, view):
