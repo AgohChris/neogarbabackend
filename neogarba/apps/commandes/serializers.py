@@ -10,10 +10,10 @@ class LigneCommandeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LigneCommande
-        fields = ['id', 'nom_plat', 'quantite', 'sous_total', 'instructions']
+        fields = ['id', 'nom_plat', 'quantite', 'prix_unitaire', 'sous_total', 'instructions']
 
     def get_sous_total(self, obj):
-        return obj.quantite * obj.plat.prix
+        return obj.quantite * obj.prix_unitaire  
 #Mon deuxieme serializer CommandeSrializer
 
 class CommandeSerializer(serializers.ModelSerializer):

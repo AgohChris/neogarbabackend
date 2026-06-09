@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 
@@ -16,7 +17,8 @@ from apps.commandes.serializers import (
     CreerCommandeSerializer,
     MajStatutSerializer,
 )
-from apps.commandes.permissions import EstServeur, EstClient
+from apps.commandes.permissions import HasRole
+from apps.cores.enums import RoleEnum
 
 
 class ListerMesCommandesView(APIView):
@@ -27,8 +29,11 @@ class ListerMesCommandesView(APIView):
             client=request.user
         ).order_by('-date_commande')
 
-        serializer = CommandeListeSerializer(commandes, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        result = paginator.paginate_queryset(commandes, request)
+        serializer = CommandeListeSerializer(result, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class DetailCommandeView(APIView):
@@ -37,7 +42,7 @@ class DetailCommandeView(APIView):
     def get(self, request, id):
         commande = get_object_or_404(Commande, id=id)
 
-        if commande.client != request.user and request.user.role != 'SERVEUR':
+        if commande.client != request.user and request.user.role != RoleEnum.SERVEUR:
             return Response(
                 {'detail': 'Accès refusé.'},
                 status=status.HTTP_403_FORBIDDEN
@@ -47,33 +52,38 @@ class DetailCommandeView(APIView):
         return Response(serializer.data)
 
 class CommandesEntrantesView(APIView):
-    permission_classes = [IsAuthenticated, EstServeur]
+    permission_classes = [IsAuthenticated, HasRole.for_role(RoleEnum.SERVEUR)]
 
     def get(self, request):
         commandes = Commande.objects.filter(
             statut='RECUE'
-        ).order_by('date_commande')  
+        ).order_by('date_commande')
 
-        serializer = CommandeListeSerializer(commandes, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        result = paginator.paginate_queryset(commandes, request)
+        serializer = CommandeListeSerializer(result, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class ToutesCommandesView(APIView):
-    permission_classes = [IsAuthenticated, EstServeur]
+    permission_classes = [IsAuthenticated, HasRole.for_role(RoleEnum.SERVEUR)]
 
     def get(self, request):
         qs = Commande.objects.all().order_by('-date_commande')
 
-       
         statut = request.query_params.get('statut')
         if statut:
             qs = qs.filter(statut=statut)
 
-        serializer = CommandeListeSerializer(qs, many=True)
-        return Response(serializer.data)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        result = paginator.paginate_queryset(qs, request)
+        serializer = CommandeListeSerializer(result, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class MajStatutCommandeView(APIView):
-    permission_classes = [IsAuthenticated, EstServeur]
+    permission_classes = [IsAuthenticated, HasRole.for_role(RoleEnum.SERVEUR)]
 
     def put(self, request, id):
         commande = get_object_or_404(Commande, id=id)
@@ -90,7 +100,7 @@ class MajStatutCommandeView(APIView):
         return Response(CommandeSerializer(commande).data)
 
 class CreerCommandeView(APIView):
-    permission_classes = [IsAuthenticated, EstClient]
+    permission_classes = [IsAuthenticated, HasRole.for_role(RoleEnum.CLIENT)]
 
     def post(self, request):
         serializer = CreerCommandeSerializer(data=request.data)
@@ -113,13 +123,15 @@ class CreerCommandeView(APIView):
             montant_total=montant_total,
             mode_recuperation=serializer.validated_data['mode_recuperation'],
             note=serializer.validated_data.get('note', ''),
-        )
+            adresse_livraison_id=serializer.validated_data.get('adresse_livraison_id'),
+)
 
         for ligne in panier.paniers.select_related('plat').all():
             LigneCommande.objects.create(
                 commande=commande,
                 plat=ligne.plat,
                 quantite=ligne.quantite,
+                prix_unitaire=ligne.prix_unitaire,
                 instructions=ligne.instruction,
             )
 
@@ -129,3 +141,8 @@ class CreerCommandeView(APIView):
             CommandeSerializer(commande).data,
             status=status.HTTP_201_CREATED
         )
+
+
+
+#Le livreur doit avoir  toutrd les infos sur la livraison et cela doit se faire en reliant l'adresse de commande au livreur
+#pour que la livraison soit effective

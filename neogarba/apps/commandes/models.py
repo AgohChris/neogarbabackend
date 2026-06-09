@@ -139,13 +139,21 @@ class Commande(models.Model):
         related_name='commandes',
     )
 
-    serveur=models.ForeignKey(
-        Serveur,
-        on_delete=models.CASCADE,
-        related_name='commandes_preparees'
+    serveur = models.ForeignKey(
+    Serveur,
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+    related_name='commandes_preparees'
     )
 
-
+    adresse_livraison = models.ForeignKey(
+    'utilisateurs.AdresseLivraison',
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+    related_name='commandes'
+)
 
 
     def save(self, *args, **kwargs):
@@ -156,7 +164,6 @@ class Commande(models.Model):
     class Meta:
         verbose_name = "commande"
         verbose_name_plural = "commandes"
-
 
 
 
@@ -174,6 +181,7 @@ class LigneCommande(models.Model):
     )
 
     quantite = models.PositiveIntegerField()
+    prix_unitaire = models.PositiveIntegerField(default=0)
     instructions = models.TextField(
         blank=True, default=''
     )

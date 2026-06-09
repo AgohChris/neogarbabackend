@@ -1,11 +1,21 @@
 from rest_framework.permissions import BasePermission
+from apps.cores.enums import RoleEnum
 
 
-class EstServeur(BasePermission):
+class HasRole(BasePermission):
+    """
+    Permission générique basée sur le rôle.
+    Usage : HasRole.for_role(RoleEnum.SERVEUR)
+    """
+    required_role = None
+
     def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.role == 'SERVEUR')
+        return bool(
+            request.user and
+            request.user.is_authenticated and
+            request.user.role == self.required_role
+        )
 
-
-class EstClient(BasePermission):
-    def has_permission(self, request, view):
-        return bool(request.user and request.user.is_authenticated and request.user.role == 'CLIENT')
+    @classmethod
+    def for_role(cls, role):
+        return type(f'HasRole_{role}', (cls,), {'required_role': role})
